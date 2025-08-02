@@ -27,15 +27,14 @@ const SwapInterface = () => {
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        const response = await axios.get('https://api.1inch.dev/token/v1.2/1/tokens', {
-          headers: { Authorization: 'Bearer YOUR_1INCH_API_KEY' },
-        });
+        const response = await axios.get('http://localhost:3001/tokens'); // Local server endpoint
         const tokenList = Object.values(response.data).map((token) => ({
           symbol: token.symbol,
           address: token.address,
           decimals: token.decimals,
           name: token.name,
         }));
+        console.log("response", response.data);
         setTokens(tokenList);
       } catch (err) {
         setError('Failed to fetch tokens');
@@ -43,6 +42,7 @@ const SwapInterface = () => {
     };
     fetchTokens();
   }, []);
+  
 
   // Fetch price quote when sell amount or tokens change
   useEffect(() => {
@@ -50,19 +50,27 @@ const SwapInterface = () => {
       const fetchQuote = async () => {
         setLoading(true);
         try {
-          const amountInWei = Web3.utils.toWei(sellAmount, sellToken.decimals === 18 ? 'ether' : 'mwei');
-          const response = await axios.get('https://api.1inch.dev/swap/v6.0/1/quote', {
+          const amountInWei = Web3.utils.toWei(
+            sellAmount,
+            sellToken.decimals === 18 ? 'ether' : 'mwei'
+          );
+          const response = await axios.get('http://localhost:3001/quote', {
             params: {
               src: sellToken.address,
               dst: buyToken.address,
               amount: amountInWei,
-              includeTokensInfo: true,
             },
-            headers: { Authorization: 'Bearer YOUR_1INCH_API_KEY' },
           });
-          const toAmount = response.data.toAmount / Math.pow(10, buyToken.decimals);
+          console.log("response quote", response.data);
+  
+          const quote = response.data;
+
+          const toAmount = Number(quote.dstAmount) / Math.pow(10, quote.dstToken.decimals);
           setBuyAmount(toAmount.toFixed(6));
-          setPrice(response.data.toAmount / response.data.fromAmount);
+          
+          const price = toAmount / (Number(amount) / Math.pow(10, quote.srcToken.decimals));
+          setPrice(price.toFixed(6));
+          
         } catch (err) {
           setError('Failed to fetch quote');
         } finally {
@@ -75,6 +83,7 @@ const SwapInterface = () => {
       setPrice(null);
     }
   }, [sellAmount, sellToken, buyToken, snap.isConnected]);
+  
 
   // Handle swap execution
   const handleSwap = async () => {
@@ -255,24 +264,45 @@ const SwapInterface = () => {
         )}
 
         {/* Swap Button */}
-        <button
-          onClick={handleSwap}
-          disabled={loading || !snap.isConnected || !sellAmount}
-          className="swap-button"
-        >
-          {loading ? (
-            <div className="loading-content">
-              <div className="loading-spinner"></div>
-              <span>Processing...</span>
-            </div>
-          ) : !snap.isConnected ? (
-            'Connect Wallet'
-          ) : !sellAmount ? (
-            'Enter an amount'
-          ) : (
-            'Swap'
-          )}
-        </button>
+        <div className="swap-button-container">
+          <button
+            onClick={handleSwap}
+            disabled={loading || !snap.isConnected || !sellAmount}
+            className="swap-button"
+            title={
+              loading 
+                ? "Processing swap..." 
+                : !snap.isConnected 
+                ? "Please connect wallet first" 
+                : !sellAmount 
+                ? "Please enter an amount to swap" 
+                : "Click to execute swap"
+            }
+          >
+            {loading ? (
+              <div className="loading-content">
+                <div className="loading-spinner"></div>
+                <span>Processing...</span>
+              </div>
+            ) : !snap.isConnected ? (
+              'First Connect Wallet'
+            ) : (
+              'Swap'
+            )}
+          </button>
+          
+          {/* Hover Tooltip */}
+          <div className="swap-button-tooltip">
+            {loading 
+              ? "Processing swap..." 
+              : !snap.isConnected 
+              ? "Please connect wallet first" 
+              : !sellAmount 
+              ? "Please enter an amount to swap" 
+              : "Click to execute swap"
+            }
+          </div>
+        </div>
       </div>
     </div>
   );
