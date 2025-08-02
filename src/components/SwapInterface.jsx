@@ -3,13 +3,10 @@ import { useSnapshot } from 'valtio';
 import axios from 'axios';
 import Web3 from 'web3';
 import walletStore from '../store/walletStore';
-import TokenSelector from './TokenSelector';
-import { message } from 'antd';
 
 const SwapInterface = () => {
   const [sellAmount, setSellAmount] = useState('');
   const [buyAmount, setBuyAmount] = useState('');
-  const [messageApi, contextHolder] = message.useMessage();
   const [sellToken, setSellToken] = useState({
     symbol: 'ETH',
     address: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
@@ -24,8 +21,6 @@ const SwapInterface = () => {
   const [price, setPrice] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showSellTokenSelector, setShowSellTokenSelector] = useState(false);
-  const [showBuyTokenSelector, setShowBuyTokenSelector] = useState(false);
   const snap = useSnapshot(walletStore);
 
   // Fetch token list from 1inch API
@@ -33,13 +28,13 @@ const SwapInterface = () => {
     const fetchTokens = async () => {
       try {
         const response = await axios.get('http://localhost:3001/tokens'); // Local server endpoint
-        const tokenList = Object.values(response.data.tokens).map((token) => ({
+        const tokenList = Object.values(response.data).map((token) => ({
           symbol: token.symbol,
           address: token.address,
           decimals: token.decimals,
           name: token.name,
         }));
-        console.log("response", response.data,"and",tokenList);
+        console.log("response", response.data);
         setTokens(tokenList);
       } catch (err) {
         setError('Failed to fetch tokens');
@@ -95,13 +90,10 @@ const SwapInterface = () => {
 
     if (!snap.isConnected) {
       setError('Wallet not connected');
-      messageApi.error('Wallet not connected');
-
       return;
     }
     if (!sellAmount || parseFloat(sellAmount) <= 0) {
       setError('Enter a valid amount');
-      messageApi.error('Enter a valid amount');
       return;
     }
     setLoading(true);
@@ -127,13 +119,11 @@ const SwapInterface = () => {
         gasPrice: response.data.tx.gasPrice,
       };
       await web3.eth.sendTransaction(tx);
-      messageApi.success('Swap successful!');
+      alert('Swap successful!');
       setSellAmount('');
       setBuyAmount('');
     } catch (err) {
       setError('Swap failed: ' + err.message);
-      console.log("error", err);
-      messageApi.error('Swap failed: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -147,18 +137,7 @@ const SwapInterface = () => {
     setBuyAmount(sellAmount);
   };
 
-  // Handle token selection
-  const handleSellTokenSelect = (token) => {
-    setSellToken(token);
-  };
-
-  const handleBuyTokenSelect = (token) => {
-    setBuyToken(token);
-  };
-
   return (
-    <>
-    {contextHolder}
     <div className="swap-interface-container">
       <div className="swap-card">
         {/* Header */}
@@ -185,27 +164,25 @@ const SwapInterface = () => {
               <div className="usd-value">≈ $0.00</div>
             </div>
             <div className="token-selector-container">
-              <button 
-                className="token-selector-btn"
-                onClick={() => setShowSellTokenSelector(true)}
-              >
-                <div className="token-icon">
-                  {sellToken.logoURI ? (
-                    <img 
-                      src={sellToken.logoURI} 
-                      alt={sellToken.symbol}
-                      className="token-logo"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'block';
-                      }}
-                    />
-                  ) : null}
-                  <div className="token-icon-fallback">⚡</div>
-                </div>
+              <button className="token-selector-btn">
+                <div className="token-icon">⚡</div>
                 <span className="token-symbol">{sellToken.symbol}</span>
                 <div className="token-arrow">▼</div>
               </button>
+              <select
+                value={sellToken.symbol}
+                onChange={(e) => {
+                  const token = tokens.find((t) => t.symbol === e.target.value);
+                  setSellToken(token);
+                }}
+                className="token-select-hidden"
+              >
+                {tokens.map((token) => (
+                  <option key={token.address} value={token.symbol}>
+                    {token.symbol}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
@@ -239,27 +216,25 @@ const SwapInterface = () => {
               <div className="usd-value">≈ $0.00</div>
             </div>
             <div className="token-selector-container">
-              <button 
-                className="token-selector-btn"
-                onClick={() => setShowBuyTokenSelector(true)}
-              >
-                <div className="token-icon">
-                  {buyToken.logoURI ? (
-                    <img 
-                      src={buyToken.logoURI} 
-                      alt={buyToken.symbol}
-                      className="token-logo"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'block';
-                      }}
-                    />
-                  ) : null}
-                  <div className="token-icon-fallback">💎</div>
-                </div>
+              <button className="token-selector-btn">
+                <div className="token-icon">💎</div>
                 <span className="token-symbol">{buyToken.symbol}</span>
                 <div className="token-arrow">▼</div>
               </button>
+              <select
+                value={buyToken.symbol}
+                onChange={(e) => {
+                  const token = tokens.find((t) => t.symbol === e.target.value);
+                  setBuyToken(token);
+                }}
+                className="token-select-hidden"
+              >
+                {tokens.map((token) => (
+                  <option key={token.address} value={token.symbol}>
+                    {token.symbol}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
@@ -281,12 +256,12 @@ const SwapInterface = () => {
         )}
 
         {/* Error Message */}
-        {/* {error && (
+        {error && (
           <div className="error-message">
             <div className="error-icon">⚠️</div>
             <span className="error-text">{error}</span>
           </div>
-        )} */}
+        )}
 
         {/* Swap Button */}
         <div className="swap-button-container">
@@ -329,27 +304,7 @@ const SwapInterface = () => {
           </div>
         </div>
       </div>
-
-      {/* Token Selector Modals */}
-      <TokenSelector
-        isOpen={showSellTokenSelector}
-        onClose={() => setShowSellTokenSelector(false)}
-        onSelectToken={handleSellTokenSelect}
-        tokens={tokens}
-        selectedToken={sellToken}
-        title="Select a token to sell"
-      />
-      
-      <TokenSelector
-        isOpen={showBuyTokenSelector}
-        onClose={() => setShowBuyTokenSelector(false)}
-        onSelectToken={handleBuyTokenSelect}
-        tokens={tokens}
-        selectedToken={buyToken}
-        title="Select a token to buy"
-      />
     </div>
-    </>
   );
 };
 
