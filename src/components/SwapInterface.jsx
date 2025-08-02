@@ -27,12 +27,13 @@ const SwapInterface = () => {
   const [showSellTokenSelector, setShowSellTokenSelector] = useState(false);
   const [showBuyTokenSelector, setShowBuyTokenSelector] = useState(false);
   const snap = useSnapshot(walletStore);
+  const API_LINK =  "http://localhost:3001";
 
   // Fetch token list from 1inch API
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/tokens'); // Local server endpoint
+        const response = await axios.get(`${API_LINK}/tokens`) // Local server endpoint
         const tokenList = Object.values(response.data.tokens).map((token) => ({
           symbol: token.symbol,
           address: token.address,
@@ -59,7 +60,7 @@ const SwapInterface = () => {
             sellAmount,
             sellToken.decimals === 18 ? 'ether' : 'mwei'
           );
-          const response = await axios.get('http://localhost:3001/quote', {
+          const response = await axios.get(`${API_LINK}/quote`, {
             params: {
               src: sellToken.address,
               dst: buyToken.address,
@@ -109,7 +110,7 @@ const SwapInterface = () => {
       const web3 = new Web3(window.ethereum);
       const amountInWei = Web3.utils.toWei(sellAmount, sellToken.decimals === 18 ? 'ether' : 'mwei');
 
-      const response = await axios.get('http://localhost:3001/swap', {
+      const response = await axios.get(`${API_LINK}/swap`, {
         params: {
           src: sellToken.address,
           dst: buyToken.address,
