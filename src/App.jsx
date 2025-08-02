@@ -23,26 +23,10 @@ function App() {
           <div className="logo">
             <div className="logo-icon">🦄</div>
             <span>Uniswap</span>
-            <span className="dropdown-arrow">▼</span>
-          </div>
-          <div className="nav-links">
-            <a href="#" className="nav-link">Trade</a>
-            <a href="#" className="nav-link">Explore</a>
-            <a href="#" className="nav-link">Pool</a>
-          </div>
-        </div>
-        
-        <div className="nav-center">
-          <div className="search-bar">
-            <span className="search-icon">🔍</span>
-            <input type="text" placeholder="Search tokens and pools" />
-            <span className="search-shortcut">/</span>
           </div>
         </div>
         
         <div className="nav-right">
-          <span className="nav-dots">⋯</span>
-          <button className="btn-secondary">Get the app</button>
           <button className="btn-primary">Connect</button>
         </div>
       </nav>
