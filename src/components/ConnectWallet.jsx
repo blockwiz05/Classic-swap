@@ -1,18 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useSnapshot } from 'valtio';
 import { BrowserProvider } from 'ethers';
+import walletStore from '../store/walletStore';
 
-function ConnectWallet({ onWalletConnected }) {
-  const [walletAddress, setWalletAddress] = useState('');
+function ConnectWallet() {
+  const { walletAddress, isConnected } = useSnapshot(walletStore);
 
   const connectWallet = async () => {
     if (typeof window.ethereum !== 'undefined') {
       try {
-        const provider = new BrowserProvider(window.ethereum); // ✅ Correct for ethers v6
+        const provider = new BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
 
-        setWalletAddress(address);
-        onWalletConnected(address);
+        walletStore.setWalletAddress(address);
       } catch (err) {
         console.error('Wallet connection failed:', err);
       }
@@ -21,13 +22,25 @@ function ConnectWallet({ onWalletConnected }) {
     }
   };
 
+  const disconnectWallet = () => {
+    walletStore.disconnect();
+  };
+
   const shortenAddress = (addr) =>
     addr.slice(0, 6) + '...' + addr.slice(-4);
 
   return (
-    <button className="btn-primary" onClick={connectWallet}>
-      {walletAddress ? shortenAddress(walletAddress) : 'Connect Wallet'}
-    </button>
+    <div className="nav-right">
+      {isConnected ? (
+        <button className="btn-secondary" onClick={disconnectWallet}>
+          {shortenAddress(walletAddress)}
+        </button>
+      ) : (
+        <button className="btn-primary" onClick={connectWallet}>
+          Connect Wallet
+        </button>
+      )}
+    </div>
   );
 }
 
