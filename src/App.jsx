@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import ConnectWallet from './components/ConnectWallet'
 
 function App() {
   const [sellAmount, setSellAmount] = useState('')
@@ -31,9 +32,7 @@ function App() {
           </div>
         </div>
         
-        <div className="nav-right">
-          <button className="btn-primary">Connect</button>
-        </div>
+        <ConnectWallet onWalletConnected={(address) => console.log('Wallet:', address)} />
       </nav>
 
       {/* Main Content */}
