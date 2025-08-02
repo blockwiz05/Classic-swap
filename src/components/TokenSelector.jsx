@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TokenIcon from './TokenIcon';
 
 const TokenSelector = ({ 
   isOpen, 
@@ -86,30 +87,11 @@ const TokenSelector = ({
                   onClick={() => handleTokenSelect(token)}
                 >
                   <div className="token-info">
-                    <div className="token-icon-container">
-                      {/* <img
-                        src={token.logoURI || '/default-token.png'}
-                        alt={token.name}
-                        className="token-icon"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'block';
-                        }}
-                      /> */}
-                      <div className="token-icon-fallback">
-                        {token.symbol?.charAt(0)}
-                      </div>
-                      {/* Network indicator overlay */}
-                      {token.symbol?.includes('Base') && (
-                        <div className="network-indicator base">B</div>
-                      )}
-                      {token.symbol?.includes('Unichain') && (
-                        <div className="network-indicator unichain">U</div>
-                      )}
-                      {token.symbol?.includes('Binance') && (
-                        <div className="network-indicator binance">BNB</div>
-                      )}
-                    </div>
+                    <TokenIcon 
+                      token={token} 
+                      size="medium" 
+                      showNetworkIndicator={true}
+                    />
                     <div className="token-details">
                       <div className="token-symbol">{token.symbol}</div>
                       <div className="token-name">

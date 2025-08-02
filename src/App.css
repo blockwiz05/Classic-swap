@@ -980,6 +980,7 @@ body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .token-logo {
@@ -987,6 +988,7 @@ body {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+  display: block;
 }
 
 .token-icon-fallback {
@@ -996,4 +998,86 @@ body {
   width: 100%;
   height: 100%;
   font-size: 0.8rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 50%;
+}
+
+/* Token Icon Container Improvements */
+.token-icon-container {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.token-icon-container .token-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.token-icon-container .token-icon:hover {
+  transform: scale(1.05);
+}
+
+.token-icon-container .token-icon-fallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-transform: uppercase;
+}
+
+/* Size classes for TokenIcon component */
+.w-6 {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.w-10 {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.w-12 {
+  width: 3rem;
+  height: 3rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-base {
+  font-size: 1rem;
+}
+
+/* Loading state for images */
+.token-icon-container.loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }

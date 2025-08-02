@@ -4,6 +4,7 @@ import axios from 'axios';
 import Web3 from 'web3';
 import walletStore from '../store/walletStore';
 import TokenSelector from './TokenSelector';
+import TokenIcon from './TokenIcon';
 import { message } from 'antd';
 
 const SwapInterface = () => {
@@ -39,6 +40,7 @@ const SwapInterface = () => {
           address: token.address,
           decimals: token.decimals,
           name: token.name,
+          logoUrl : token.logoURI
         }));
         console.log("response", response.data,"and",tokenList);
         setTokens(tokenList);
@@ -190,20 +192,11 @@ const SwapInterface = () => {
                 className="token-selector-btn"
                 onClick={() => setShowSellTokenSelector(true)}
               >
-                <div className="token-icon">
-                  {sellToken.logoURI ? (
-                    <img 
-                      src={sellToken.logoURI} 
-                      alt={sellToken.symbol}
-                      className="token-logo"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'block';
-                      }}
-                    />
-                  ) : null}
-                  <div className="token-icon-fallback">⚡</div>
-                </div>
+                                 <TokenIcon 
+                   token={sellToken} 
+                   size="small" 
+                   showNetworkIndicator={false}
+                 />
                 <span className="token-symbol">{sellToken.symbol}</span>
                 <div className="token-arrow">▼</div>
               </button>
@@ -244,20 +237,11 @@ const SwapInterface = () => {
                 className="token-selector-btn"
                 onClick={() => setShowBuyTokenSelector(true)}
               >
-                <div className="token-icon">
-                  {buyToken.logoURI ? (
-                    <img 
-                      src={buyToken.logoURI} 
-                      alt={buyToken.symbol}
-                      className="token-logo"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'block';
-                      }}
-                    />
-                  ) : null}
-                  <div className="token-icon-fallback">💎</div>
-                </div>
+                                 <TokenIcon 
+                   token={buyToken} 
+                   size="small" 
+                   showNetworkIndicator={false}
+                 />
                 <span className="token-symbol">{buyToken.symbol}</span>
                 <div className="token-arrow">▼</div>
               </button>
