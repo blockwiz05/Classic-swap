@@ -6,6 +6,12 @@ function App() {
   const [buyAmount, setBuyAmount] = useState('')
   const [selectedToken, setSelectedToken] = useState('ETH')
 
+  const handleSwapDirection = () => {
+    // Swap the amounts
+    setSellAmount(buyAmount)
+    setBuyAmount(sellAmount)
+  }
+
   return (
     <div className="app">
       {/* Background blur elements */}
@@ -21,8 +27,7 @@ function App() {
       <nav className="navbar">
         <div className="nav-left">
           <div className="logo">
-            <div className="logo-icon">🦄</div>
-            <span>Uniswap</span>
+            <span>1Dash</span>
           </div>
         </div>
         
@@ -62,7 +67,7 @@ function App() {
 
             {/* Swap Direction Button */}
             <div className="swap-direction">
-              <button className="swap-direction-btn">
+              <button className="swap-direction-btn" onClick={handleSwapDirection}>
                 <span className="direction-arrow">↓</span>
               </button>
             </div>
