@@ -9,7 +9,6 @@ const TokenSelector = ({
   selectedToken,
   title = "Select a token" 
 }) => {
-    console.log("tokens", tokens);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredTokens, setFilteredTokens] = useState([]);
 

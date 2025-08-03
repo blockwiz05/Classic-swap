@@ -95,52 +95,62 @@ const SwapInterface = () => {
 
   // Handle swap execution
   const handleSwap = async () => {
-
     if (!snap.isConnected) {
       setError('Wallet not connected');
       messageApi.error('Wallet not connected');
-
       return;
     }
+  
     if (!sellAmount || parseFloat(sellAmount) <= 0) {
       setError('Enter a valid amount');
       messageApi.error('Enter a valid amount');
       return;
     }
+  
     setLoading(true);
     try {
       const web3 = new Web3(window.ethereum);
-      const amountInWei = Web3.utils.toWei(sellAmount, sellToken.decimals === 18 ? 'ether' : 'mwei');
-
-      const response = await axios.get(`${API_LINK}/swap`, {
-        params: {
-          src: sellToken.address,
-          dst: buyToken.address,
-          amount: amountInWei,
-          from: snap.walletAddress,
-          slippage: 1,
-        }
+      const amountInWei = Web3.utils.toWei(
+        sellAmount,
+        sellToken.decimals === 18 ? 'ether' : 'mwei'
+      );
+  
+      // 👇 Step 1: Call your backend to get calldata
+      const response = await axios.post(`${API_LINK}/api/swap-calldata`, {
+        src: sellToken.address,
+        dst: buyToken.address,
+        amount: amountInWei,
+        from: snap.walletAddress,
+        slippage: 1,
+        chainId: 1, // Ethereum Mainnet
       });
-
+      console.log("respont first call data",)
+  
+      const { to, data, value, gas, gasPrice } = response.data.tx;
+  
+      // 👇 Step 2: Send the transaction
       const tx = {
         from: snap.walletAddress,
-        to: response.data.tx.to,
-        data: response.data.tx.data,
-        gas: response.data.tx.gas,
-        gasPrice: response.data.tx.gasPrice,
+        to,
+        data,
+        value, // usually '0x0' for token → token
+        gas,
+        gasPrice,
       };
+  
       await web3.eth.sendTransaction(tx);
       messageApi.success('Swap successful!');
       setSellAmount('');
       setBuyAmount('');
     } catch (err) {
+      console.error('Swap failed:', err);
       setError('Swap failed: ' + err.message);
-      console.log("error", err);
       messageApi.error('Swap failed: ' + err.message);
     } finally {
       setLoading(false);
     }
   };
+  
 
   // Handle swap direction
   const handleSwapDirection = () => {
